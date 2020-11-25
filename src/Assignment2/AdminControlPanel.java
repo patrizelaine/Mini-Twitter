@@ -12,7 +12,7 @@ package Assignment2;
 import java.awt.Color;
 import java.awt.event.*;
 import java.util.HashMap;
-
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.tree.*;
@@ -25,7 +25,7 @@ public class AdminControlPanel extends JFrame {
 	private JTree tree;
 	private String userId, groupId;
 	private JTextArea userIdField, groupIdField;
-	private JButton addUserButton, addGroupButton, openUserViewButton, userTotButton, groupTotButton, messageTotButton, positiveButton;
+	private JButton lastUserButton, verifyIdButton, addUserButton, addGroupButton, openUserViewButton, userTotButton, groupTotButton, messageTotButton, positiveButton;
 	private static HashMap<String, User> totalUsers = new HashMap<String,User>();
 	private HashMap<String, Group> totalGroups = new HashMap<String,Group>();
 	private DefaultMutableTreeNode currentNode, root;
@@ -100,6 +100,18 @@ public class AdminControlPanel extends JFrame {
 		openUserViewButton.addActionListener(new openUserViewListener());
 		panel.add(openUserViewButton);
 		
+		// Last updated user button
+		lastUserButton = new JButton("Last Updated User");
+		lastUserButton.setBounds(230, 220, 200, 25);
+		lastUserButton.addActionListener(new lastUserListener());
+		panel.add(lastUserButton);
+		
+		// User and group ID verification button
+		verifyIdButton = new JButton("Verify IDs");
+		verifyIdButton.setBounds(430, 220, 200, 25);
+		verifyIdButton.addActionListener(new verifyIdListener());
+		panel.add(verifyIdButton);
+		
 		// Show user total button
 		userTotButton = new JButton("Show User Total");
 		userTotButton.setBounds(230, 250, 200, 25);
@@ -130,6 +142,69 @@ public class AdminControlPanel extends JFrame {
 		return totalUsers;
 	}
 	
+	private class lastUserListener implements ActionListener
+	{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			IncrementingVisitor lastUser = new IncrementingVisitor();
+			String last = lastUser.getLastUser();
+			if(last==null)
+			{
+	        	JOptionPane.showMessageDialog(null, "None of the users have an update.");
+
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(null, "Last updated user: " + last);
+			}
+		}
+	}
+	
+	private class verifyIdListener implements ActionListener
+	{
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			if(totalGroups.isEmpty() && totalUsers.isEmpty())
+			{
+				JOptionPane.showMessageDialog(null, "There are no IDs to validate.");
+			}
+			
+			// Checks if group IDs contain a space
+			for (Map.Entry groupElement : totalGroups.entrySet())
+			{
+				String groupKey = (String)groupElement.getKey();
+				if(groupKey.contains(" "))
+				{
+					JOptionPane.showMessageDialog(null, "Not all IDs are valid.");
+	            	break;
+				}
+			}
+			for (Map.Entry userElement : totalUsers.entrySet()) { 
+	            String userKey = (String)userElement.getKey(); 
+	            
+	            // Checks if IDs are unique among users and groups
+	            if(totalGroups.containsKey(userKey))
+	            {
+	            	JOptionPane.showMessageDialog(null, "Not all IDs are valid.");
+	            	break;
+	            }
+	            // Checks if IDs contain a space
+	            if(userKey.contains(" "))
+	            {
+	            	JOptionPane.showMessageDialog(null, "Not all IDs are valid.");
+	            	break;
+	            }
+	            // Else all IDs are valid
+	            else
+	            {
+	            	JOptionPane.showMessageDialog(null, "All IDs are valid.");
+	            }
+	        }
+		}
+	}
+	
 	private class addUserListener implements ActionListener 
 	{
 		@Override
@@ -155,7 +230,9 @@ public class AdminControlPanel extends JFrame {
 			}
 			else
 			{
+				Long timestamp = System.currentTimeMillis();
 				User user = new User(userId);
+				user.setCreationTime(timestamp);
 				user.setColor(Color.black);
 				totalUsers.put(userId, user);
 				TotalVisitor newUser = new IncrementingVisitor();
@@ -201,7 +278,10 @@ public class AdminControlPanel extends JFrame {
 			else
 			{
 				// Creating a new group
+				Long timestamp = System.currentTimeMillis();
 				Group group = new Group(groupId);
+				group.setCreationTime(timestamp);
+				
 				totalGroups.put(groupId, group);
 				TotalVisitor newUser = new IncrementingVisitor();
 				group.accept(newUser);

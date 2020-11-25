@@ -11,6 +11,6 @@ package Assignment2;
 
 public interface Observer {
 	
-	public void update(String tweet);
+	public void update(String tweet, Long time);
 
 }

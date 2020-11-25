@@ -17,6 +17,7 @@ public class IncrementingVisitor implements TotalVisitor
 	private static int groupTot;
 	private static int tweetTot;
 	private static int posTot;
+	private static String lastUser;
 
 	@Override
 	public void visitUser(User user) {
@@ -59,6 +60,16 @@ public class IncrementingVisitor implements TotalVisitor
 	public int getPosTot()
 	{
 		return posTot;
+	}
+
+	@Override
+	public void visitLastUser(LastUser currUser) {
+		lastUser = currUser.getUserId();
+	}
+	
+	public String getLastUser()
+	{
+		return lastUser;
 	}
 
 }

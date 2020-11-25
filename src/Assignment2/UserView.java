@@ -21,7 +21,7 @@ public class UserView extends JFrame
 {
 	private JPanel userPanel;
 	private JTextArea followIdField, tweetField;
-	private JLabel followLabel, newsLabel, followerLabel;
+	private JLabel followLabel, newsLabel, followerLabel, timeCreationLabel;
 	private JButton followIdButton, tweetButton;
 	private JList followingsList, newsFeedList, followersList;
 	private DefaultListModel followingsModel, newsFeedModel, followersModel;
@@ -48,13 +48,11 @@ public class UserView extends JFrame
 		userPanel.setLayout(null);	
 		
 		String color = userPanel.getBackground().toString();
-		System.out.println(color);
 		
 		// If the user is being opened for the first time, it sets the background color randomly
 		if(color.equals("java.awt.Color[r=0,g=0,b=0]"))
 		{
 			int rand = (int) ( Math.random() * 2 + 1);
-			System.out.println("hello");
 			// Sets to orange
 			if(rand==1)
 			{
@@ -135,6 +133,11 @@ public class UserView extends JFrame
 		newsLabel = new JLabel("News Feed:");
 		newsLabel.setBounds(20, 275, 230, 25);
 		userPanel.add(newsLabel);
+		
+		// Followings label
+		newsLabel = new JLabel("Last updated: " + currentUser.getUpdate());
+		newsLabel.setBounds(220, 275, 230, 25);
+		userPanel.add(newsLabel);
 				
 		// Showing the user's newsfeed
 		newsFeedModel = new DefaultListModel();
@@ -149,6 +152,11 @@ public class UserView extends JFrame
 		{
 			newsFeedModel.addElement(userFeedList.get(i));
 		}
+		
+		// Time creation label
+		timeCreationLabel = new JLabel("User created at " + currentUser.getCreationTime());
+		timeCreationLabel.setBounds(20, 455, 230, 25);
+		userPanel.add(timeCreationLabel);
 	}
 	
 	private class FollowIdListener implements ActionListener
@@ -194,9 +202,16 @@ public class UserView extends JFrame
 			}
 			else
 			{
+				// Sets the update time of the newsfeed
+				Long timestamp = System.currentTimeMillis();
+				
 				currentUser.notifyObservers(newTweet);
-				currentUser.update(newTweet);
+				currentUser.update(newTweet, timestamp);
 				newsFeedModel.addElement(newTweet);
+				
+				LastUser lastUser = new LastUser(currentUser.getId());
+				TotalVisitor updateLastUser = new IncrementingVisitor();
+				lastUser.accept(updateLastUser);
 				
 				Tweet tweet = new Tweet();
 				TotalVisitor incrementTweet = new IncrementingVisitor();

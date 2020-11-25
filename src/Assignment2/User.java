@@ -17,6 +17,8 @@ import java.util.HashMap;
 public class User implements Visitable, TwitterEntry, Observer, Subject {
 	
 	private String userId;
+	private Long creationTime, updateTime;
+	private User lastUpdatedUser;
 	private Color color;
 	private ArrayList<String> followers;
 	private ArrayList<String> followings;
@@ -36,6 +38,21 @@ public class User implements Visitable, TwitterEntry, Observer, Subject {
 	public Color getColor()
 	{
 		return color;
+	}
+	
+	public void setLastUser(User user)
+	{
+		lastUpdatedUser = user;
+	}
+	
+	public User getLastUser()
+	{
+		return lastUpdatedUser;
+	}
+	
+	public Long getUpdate()
+	{
+		return updateTime;
 	}
 	
 	public User(String id)
@@ -80,8 +97,10 @@ public class User implements Visitable, TwitterEntry, Observer, Subject {
 
 
 	@Override
-	public void update(String tweet) {
-		feed.add(tweet);
+	public void update(String tweet, Long time) {
+		feed.add(tweet);		// Updates newsfeed
+		updateTime = time;		// Updates time of the newsfeed
+		
 	}
 
 
@@ -102,9 +121,26 @@ public class User implements Visitable, TwitterEntry, Observer, Subject {
 			// Gets the user ID of all of the followers
 			String userFollower = getUser().getFollowers().get(i);
 			
+			// Updates the current user
 			User currentUser = twitterUsers.get(userFollower);
-			currentUser.update(tweet);
+			
+			// Gets the time of updating the user
+			Long timestamp = System.currentTimeMillis();
+			
+			// Updates the user's newsfeed and time of update
+			currentUser.update(tweet, timestamp);
 		}
+	}
+
+	@Override
+	public void setCreationTime(Long time) {
+		creationTime = time;
+		
+	}
+
+	@Override
+	public Long getCreationTime() {
+		return creationTime;
 	}
 
 }

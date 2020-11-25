@@ -15,5 +15,6 @@ public interface TotalVisitor {
 	public void visitGroup(Group group);
 	public void visitTweet(Tweet tweet);
 	public void visitPos(PositivePercent posPercent);
+	public void visitLastUser(LastUser lastUser);
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public class Group implements Visitable, TwitterEntry {
 	
 	private String groupId;
+	private Long creationTime;
 	
 	// A group can hold a list of Users and Groups
 	private List<TwitterEntry> entries;
@@ -35,5 +36,15 @@ public class Group implements Visitable, TwitterEntry {
 	@Override
 	public String getId() {
 		return groupId;
+	}
+
+	@Override
+	public void setCreationTime(Long time) {
+		creationTime = time;
+	}
+
+	@Override
+	public Long getCreationTime() {
+		return creationTime;
 	}
 }
